@@ -1,4 +1,3 @@
-// ===== com/example/app/ui/screen/home/recommend/RecommendScreen.kt =====
 package com.example.app.ui.screen.home.recommend
 
 import androidx.compose.foundation.background
@@ -33,7 +32,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun RecommendScreen(
     isFirstTimeVisible: Boolean,
-    viewModel: RecommendViewModel
+    viewModel: RecommendViewModel,
+    onNavigateToDetail: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
@@ -56,6 +56,20 @@ fun RecommendScreen(
         }.collect { (lastVisibleItemIndex, totalItemsNumber) ->
             if (lastVisibleItemIndex >= totalItemsNumber - 3 && totalItemsNumber > 0) {
                 viewModel.processIntent(RecommendIntent.LoadMore)
+            }
+        }
+    }
+
+    // 监听导航事件
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is RecommendEffect.NavigateToDetail -> {
+                    onNavigateToDetail(effect.itemId)
+                }
+                is RecommendEffect.ShowToast -> {
+                    // Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -94,6 +108,9 @@ fun RecommendScreen(
                     ) { item ->
                         RecommendCard(
                             item = item,
+                            onClick = {
+                                //viewModel.processIntent(RecommendIntent.OpenDetail(item.id))
+                            },
                             onLike = {
                                 viewModel.processIntent(RecommendIntent.LikeItem(item.id))
                             },
@@ -146,13 +163,15 @@ fun RecommendScreen(
 @Composable
 private fun RecommendCard(
     item: RecommendItem,
+    onClick: () -> Unit,
     onLike: () -> Unit,
     onShare: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {

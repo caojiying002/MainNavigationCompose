@@ -1,4 +1,3 @@
-// com/example/app/ui/screen/message/MessageScreen.kt
 package com.example.app.ui.screen.message
 
 import androidx.compose.foundation.background
@@ -20,7 +19,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun MessageScreen(
     isFirstTimeVisible: Boolean,
-    viewModel: MessageViewModel
+    viewModel: MessageViewModel,
+    onNavigateToChat: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

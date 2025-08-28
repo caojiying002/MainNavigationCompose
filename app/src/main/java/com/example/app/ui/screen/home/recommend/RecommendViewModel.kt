@@ -1,4 +1,3 @@
-// ===== com/example/app/ui/screen/home/recommend/RecommendViewModel.kt =====
 package com.example.app.ui.screen.home.recommend
 
 import androidx.lifecycle.ViewModel

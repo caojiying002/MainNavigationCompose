@@ -1,4 +1,3 @@
-// com/example/app/ui/screen/main/MainScreen.kt
 package com.example.app.ui.screen.main
 
 import androidx.compose.animation.AnimatedContent
@@ -9,14 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.app.navigation.LocalNavController
+import com.example.app.navigation.Screen
 import com.example.app.ui.components.CustomBottomBar
 import com.example.app.ui.screen.alley.AlleyScreen
 import com.example.app.ui.screen.home.HomeScreen
@@ -35,17 +32,19 @@ enum class MainTab(val title: String, val icon: String) {
 
 @Composable
 fun MainScreen() {
+    val navController = LocalNavController.current
+
     // 记录当前选中的Tab索引
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
     // 记录每个Tab是否已经被访问过（用于懒加载）
     val visitedTabs = rememberSaveable { mutableSetOf<Int>() }
-
+    
     // 当Tab切换时记录访问状态
     LaunchedEffect(selectedTabIndex) {
         visitedTabs.add(selectedTabIndex)
     }
-
+    
     Scaffold(
         bottomBar = {
             CustomBottomBar(
@@ -65,31 +64,46 @@ fun MainScreen() {
             // 使用AnimatedContent实现页面切换动画
             AnimatedContent(
                 targetState = selectedTabIndex,
-                transitionSpec = {
-                    fadeIn() togetherWith fadeOut()
-                },
+                transitionSpec = { fadeIn() togetherWith fadeOut() },
                 label = "tab_transition"
             ) { targetIndex ->
                 // 判断是否首次访问
-                val isFirstTime = (targetIndex == 0 && visitedTabs.isEmpty()) ||
-                        !visitedTabs.contains(targetIndex)
-
+                val isFirstTime = (targetIndex == 0 && visitedTabs.isEmpty()) || 
+                                  !visitedTabs.contains(targetIndex)
+                
                 when (targetIndex) {
                     0 -> HomeScreen(
                         isFirstTimeVisible = isFirstTime,
-                        viewModel = hiltViewModel()
+                        viewModel = hiltViewModel(),
+                        // HomeScreen需要导航回调（因为有嵌套页面）
+                        onNavigateToRecommendDetail = { itemId ->
+                            navController.navigate(Screen.RecommendDetail.createRoute(itemId))
+                        },
+                        onNavigateToUserProfile = { userId ->
+                            navController.navigate(Screen.FollowingUserProfile.createRoute(userId))
+                        }
                     )
                     1 -> MessageScreen(
                         isFirstTimeVisible = isFirstTime,
-                        viewModel = hiltViewModel()
+                        viewModel = hiltViewModel(),
+                        // 一级页面直接使用导航
+                        onNavigateToChat = { messageId ->
+                            navController.navigate(Screen.MessageChat.createRoute(messageId))
+                        }
                     )
                     2 -> AlleyScreen(
                         isFirstTimeVisible = isFirstTime,
-                        viewModel = hiltViewModel()
+                        viewModel = hiltViewModel(),
+                        onNavigateToDetail = { itemId ->
+                            navController.navigate(Screen.AlleyItemDetail.createRoute(itemId))
+                        }
                     )
                     3 -> MerchantScreen(
                         isFirstTimeVisible = isFirstTime,
-                        viewModel = hiltViewModel()
+                        viewModel = hiltViewModel(),
+                        onNavigateToDetail = { merchantId ->
+                            navController.navigate(Screen.MerchantDetail.createRoute(merchantId))
+                        }
                     )
                     4 -> ProfileScreen(
                         isFirstTimeVisible = isFirstTime,

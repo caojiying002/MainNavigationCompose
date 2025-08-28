@@ -1,4 +1,3 @@
-// com/example/app/ui/screen/home/HomeScreen.kt
 package com.example.app.ui.screen.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -26,19 +25,21 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     isFirstTimeVisible: Boolean,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    onNavigateToRecommendDetail: (String) -> Unit,
+    onNavigateToUserProfile: (String) -> Unit
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     val coroutineScope = rememberCoroutineScope()
 
     // 记录子页面是否已访问过
     val visitedSubPages = rememberSaveable { mutableSetOf<Int>() }
-
+    
     // 监听页面切换，记录访问状态
     LaunchedEffect(pagerState.currentPage) {
         visitedSubPages.add(pagerState.currentPage)
     }
-
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,24 +54,28 @@ fun HomeScreen(
                 }
             }
         )
-
+        
         // 页面内容 - 每个子页面都有独立的ViewModel
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize()
         ) { page ->
             // 判断是否首次访问：初始页面(0)或之前未访问过的页面
-            val isFirstTime = (page == 0 && visitedSubPages.isEmpty()) ||
-                    !visitedSubPages.contains(page)
-
+            val isFirstTime = (page == 0 && visitedSubPages.isEmpty()) || 
+                              !visitedSubPages.contains(page)
+            
             when (page) {
                 0 -> RecommendScreen(
                     isFirstTimeVisible = isFirstTime,
-                    viewModel = hiltViewModel() // 独立的RecommendViewModel
+                    viewModel = hiltViewModel(),
+                    // 传递导航回调给子页面
+                    onNavigateToDetail = onNavigateToRecommendDetail
                 )
                 1 -> FollowingScreen(
                     isFirstTimeVisible = isFirstTime,
-                    viewModel = hiltViewModel() // 独立的FollowingViewModel
+                    viewModel = hiltViewModel(),
+                    // 传递导航回调给子页面
+                    //onNavigateToUserProfile = onNavigateToUserProfile
                 )
             }
         }

@@ -22,7 +22,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun AlleyScreen(
     isFirstTimeVisible: Boolean,
-    viewModel: AlleyViewModel
+    viewModel: AlleyViewModel,
+    onNavigateToDetail: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
