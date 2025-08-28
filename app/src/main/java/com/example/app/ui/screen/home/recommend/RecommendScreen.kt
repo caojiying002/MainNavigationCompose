@@ -25,7 +25,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.app.ui.screen.home.following.FollowingIntent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,7 +32,7 @@ import kotlinx.coroutines.launch
 fun RecommendScreen(
     isFirstTimeVisible: Boolean,
     viewModel: RecommendViewModel,
-    onNavigateToDetail: (String) -> Unit
+    onNavigateToDetail: (String) -> Unit // 导航到详情页
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
@@ -68,7 +67,7 @@ fun RecommendScreen(
                     onNavigateToDetail(effect.itemId)
                 }
                 is RecommendEffect.ShowToast -> {
-                    // Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                    // 处理Toast显示
                 }
             }
         }
@@ -109,7 +108,8 @@ fun RecommendScreen(
                         RecommendCard(
                             item = item,
                             onClick = {
-                                //viewModel.processIntent(RecommendIntent.OpenDetail(item.id))
+                                // 点击卡片，打开详情
+                                viewModel.processIntent(RecommendIntent.OpenDetail(item.id))
                             },
                             onLike = {
                                 viewModel.processIntent(RecommendIntent.LikeItem(item.id))
@@ -197,9 +197,9 @@ private fun RecommendCard(
                         fontWeight = FontWeight.Medium
                     )
                 }
-
+                
                 Spacer(modifier = Modifier.width(12.dp))
-
+                
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = item.author,
@@ -214,9 +214,9 @@ private fun RecommendCard(
                     )
                 }
             }
-
+            
             Spacer(modifier = Modifier.height(12.dp))
-
+            
             // 标题
             Text(
                 text = item.title,
@@ -226,10 +226,10 @@ private fun RecommendCard(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-
+            
             Spacer(modifier = Modifier.height(8.dp))
-
-            // 内容
+            
+            // 内容预览
             Text(
                 text = item.content,
                 fontSize = 14.sp,
@@ -237,9 +237,28 @@ private fun RecommendCard(
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
-
+            
+            // 图片预览（如果有）
+            if (item.imageUrl != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFFF0F0F0)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "图片预览",
+                        color = Color(0xFF9E9E9E),
+                        fontSize = 14.sp
+                    )
+                }
+            }
+            
             Spacer(modifier = Modifier.height(12.dp))
-
+            
             // 操作栏
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -266,7 +285,7 @@ private fun RecommendCard(
                         color = if (item.isLiked) Color(0xFFE91E63) else Color(0xFF757575)
                     )
                 }
-
+                
                 // 分享按钮
                 Row(
                     modifier = Modifier

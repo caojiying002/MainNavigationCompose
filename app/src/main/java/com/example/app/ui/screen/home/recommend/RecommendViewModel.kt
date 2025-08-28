@@ -8,13 +8,14 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// MVI - Intent
+// MVI - Intent (添加OpenDetail)
 sealed class RecommendIntent {
     object LoadData : RecommendIntent()
     object Refresh : RecommendIntent()
     object LoadMore : RecommendIntent()
     data class LikeItem(val itemId: String) : RecommendIntent()
     data class ShareItem(val itemId: String) : RecommendIntent()
+    data class OpenDetail(val itemId: String) : RecommendIntent()  // 新增：打开详情
 }
 
 // MVI - State
@@ -66,6 +67,18 @@ class RecommendViewModel @Inject constructor(
             is RecommendIntent.LoadMore -> loadMore()
             is RecommendIntent.LikeItem -> toggleLike(intent.itemId)
             is RecommendIntent.ShareItem -> shareItem(intent.itemId)
+            is RecommendIntent.OpenDetail -> openDetail(intent.itemId)  // 新增处理
+        }
+    }
+
+    private fun openDetail(itemId: String) {
+        viewModelScope.launch {
+            // 可以在这里添加业务逻辑
+            // 例如：记录用户点击行为
+            // analyticsRepository.trackItemClick(itemId)
+
+            // 发送导航事件
+            _effect.emit(RecommendEffect.NavigateToDetail(itemId))
         }
     }
 

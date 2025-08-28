@@ -58,7 +58,7 @@ fun AppNavigation() {
                 )
             }
             
-            /*composable(Screen.RecommendDetail.route) { backStackEntry ->
+            composable(Screen.RecommendDetail.route) { backStackEntry ->
                 val itemId = backStackEntry.arguments?.getString("itemId") ?: ""
                 RecommendDetailScreen(
                     itemId = itemId,
@@ -66,7 +66,7 @@ fun AppNavigation() {
                 )
             }
             
-            composable(Screen.FollowingUserProfile.route) { backStackEntry ->
+            /*composable(Screen.FollowingUserProfile.route) { backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId") ?: ""
                 UserProfileScreen(
                     userId = userId,
